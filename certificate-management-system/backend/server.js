@@ -78,6 +78,14 @@ app.get('/api/health', (_req, res) => {
   });
 });
 
+app.get('/', (_req, res) => {
+  res.json({
+    success: true,
+    message: 'Certificate Management Backend is running',
+    health: '/api/health'
+  });
+});
+
 app.use(notFound);
 app.use(errorHandler);
 
