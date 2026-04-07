@@ -21,8 +21,16 @@ const generateToken = (id) => {
 router.post('/register', async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
+    const normalizedEmail = email?.trim().toLowerCase();
 
-    const userExists = await User.findOne({ email });
+    if (!name || !normalizedEmail || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide name, email and password'
+      });
+    }
+
+    const userExists = await User.findOne({ email: normalizedEmail });
 
     if (userExists) {
       return res.status(400).json({
@@ -33,7 +41,7 @@ router.post('/register', async (req, res) => {
 
     const user = await User.create({
       name,
-      email,
+      email: normalizedEmail,
       password,
       role: role || 'user'
     });
@@ -75,15 +83,16 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
+    const normalizedEmail = email?.trim().toLowerCase();
 
-    if (!email || !password) {
+    if (!normalizedEmail || !password) {
       return res.status(400).json({
         success: false,
         message: 'Please provide email and password'
       });
     }
 
-    const user = await User.findOne({ email }).select('+password');
+    const user = await User.findOne({ email: normalizedEmail }).select('+password');
 
     if (!user) {
       return res.status(401).json({
